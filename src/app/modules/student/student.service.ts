@@ -7,6 +7,6 @@ const createStudentIntoDB = async (student: Student) =>{
   return result;
 }
 
-export const studentServices = {
+export const StudentServices = {
     createStudentIntoDB,
 }

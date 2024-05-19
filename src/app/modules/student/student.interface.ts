@@ -1,6 +1,6 @@
-// import { Schema, model, connect } from 'mongoose'
-
 import { Model } from 'mongoose'
+import { TStudent } from './student.interface'
+// import { Schema, model, connect } from 'mongoose'
 
 // 1. Create an interface representing a document in MongoDB.
 
@@ -32,6 +32,7 @@ export type TLocalGuardian = {
 // 1. Create an interface representing a document in MongoDB.
 export type TStudent = {
   id: string
+  password: string
   name: TUserName
   gender: 'male' | 'female' | 'other'
   dob?: string
@@ -41,19 +42,27 @@ export type TStudent = {
   bloodGroup?: 'A+' | 'A-' | 'B+' | 'B-' | 'AB+' | 'AB-' | 'O+' | 'O-'
   presentAddress?: string
   permanentAddress?: string
-  guardian: Guardian
+  guardian: TGuardian
   localGuardian: TLocalGuardian
   profileImage?: string
   isActive: 'active' | 'blocked'
 }
 
-export type StudentMethods = {
+// For creating static
+
+export interface StudentModel extends Model<TStudent> {
   isUserExists(id: string): Promise<TStudent | null>
 }
 
+// For creating instances
+
+// export type StudentMethods = {
+//   isUserExists(id: string): Promise<TStudent | null>
+// }
+
 // Create a new Model type that knows about IUserMethods...
-export type StudentModel = Model<
-  TStudent,
-  Record<string, never>,
-  StudentMethods
->
+// export type StudentModel = Model<
+//   TStudent,
+//   Record<string, never>,
+//   StudentMethods
+// >

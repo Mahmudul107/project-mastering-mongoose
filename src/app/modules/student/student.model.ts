@@ -1,6 +1,6 @@
 import { Schema, model } from 'mongoose'
 import { Guardian, LocalGuardian, Student, UserName } from './student.interface'
-import validator from 'validator'
+
 
 // username sub-schema
 const userNameSchema = new Schema<UserName>({
@@ -9,13 +9,13 @@ const userNameSchema = new Schema<UserName>({
     required: [true, 'First name is required'],
     trim: true,
     maxlength: [20, 'Max length can not exceed 20 characters'],
-    validate: {
-      validator: function (value: string) {
-        const firstNameStr = value.charAt(0).toUpperCase() + value.slice(1)
-        return firstNameStr === value
-      },
-      message: '{VALUE} is appropriate',
-    },
+    // validate: {
+    //   validator: function (value: string) {
+    //     const firstNameStr = value.charAt(0).toUpperCase() + value.slice(1)
+    //     return firstNameStr === value
+    //   },
+    //   message: '{VALUE} is appropriate',
+    // },
   },
   middleName: {
     type: 'string',
@@ -26,10 +26,10 @@ const userNameSchema = new Schema<UserName>({
     type: 'string',
     trim: true,
     required: [true, 'Last name is required'],
-    validate: {
-      validator: (value: string) => validator.isAlpha(value),
-      message: '{VALUE} is not a valid',
-    },
+    // validate: {
+    //   validator: (value: string) => validator.isAlpha(value),
+    //   message: '{VALUE} is not a valid',
+    // },
   },
 })
 
@@ -107,10 +107,10 @@ const studentSchema = new Schema<Student>({
     type: String,
     required: [true, 'Please enter your email address'],
     unique: true,
-    validate: {
-      validator: (value: string) => validator.isEmail(value),
-      message: "{VALUE} is not valid ,Please enter with your valid email address"
-    }
+    // validate: {
+    //   validator: (value: string) => validator.isEmail(value),
+    //   message: "{VALUE} is not valid ,Please enter with your valid email address"
+    // }
   },
   contactNo: {
     type: String,

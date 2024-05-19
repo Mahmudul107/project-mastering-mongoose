@@ -1,16 +1,18 @@
 // import { Schema, model, connect } from 'mongoose'
 
+import { Model } from 'mongoose'
+
 // 1. Create an interface representing a document in MongoDB.
 
 // username sub-interface
-export type UserName = {
+export type TUserName = {
   firstName: string
   middleName?: string
   lastName: string
 }
 
 // guardian sub-interface
-export type Guardian = {
+export type TGuardian = {
   fatherName: string
   fatherOccupation: string
   fatherContactNo: string
@@ -20,7 +22,7 @@ export type Guardian = {
 }
 
 // local guardian sub-interface
-export type LocalGuardian = {
+export type TLocalGuardian = {
   name: string
   occupation: string
   contactNo: string
@@ -28,9 +30,9 @@ export type LocalGuardian = {
 }
 
 // 1. Create an interface representing a document in MongoDB.
-export type Student = {
+export type TStudent = {
   id: string
-  name: UserName
+  name: TUserName
   gender: 'male' | 'female' | 'other'
   dob?: string
   email: string
@@ -40,7 +42,18 @@ export type Student = {
   presentAddress?: string
   permanentAddress?: string
   guardian: Guardian
-  localGuardian: LocalGuardian
+  localGuardian: TLocalGuardian
   profileImage?: string
   isActive: 'active' | 'blocked'
 }
+
+export type StudentMethods = {
+  isUserExists(id: string): Promise<TStudent | null>
+}
+
+// Create a new Model type that knows about IUserMethods...
+export type StudentModel = Model<
+  TStudent,
+  Record<string, never>,
+  StudentMethods
+>

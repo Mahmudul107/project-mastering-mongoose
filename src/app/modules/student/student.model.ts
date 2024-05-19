@@ -1,9 +1,15 @@
 import { Schema, model } from 'mongoose'
-import { Guardian, LocalGuardian, Student, UserName } from './student.interface'
-
+import {
+  TGuardian,
+  TLocalGuardian,
+  TStudent,
+  StudentMethods,
+  StudentModel,
+  TUserName,
+} from './student.interface'
 
 // username sub-schema
-const userNameSchema = new Schema<UserName>({
+const userNameSchema = new Schema<TUserName>({
   firstName: {
     type: 'string',
     required: [true, 'First name is required'],
@@ -34,7 +40,7 @@ const userNameSchema = new Schema<UserName>({
 })
 
 // guardian sub-schema
-const guardianSchema = new Schema<Guardian>({
+const guardianSchema = new Schema<TGuardian>({
   fatherName: {
     type: String,
     trim: true,
@@ -65,7 +71,7 @@ const guardianSchema = new Schema<Guardian>({
 })
 
 // local guardian sub-schema
-const localGuardianSchema = new Schema<LocalGuardian>({
+const localGuardianSchema = new Schema<TLocalGuardian>({
   name: {
     type: String,
     trim: true,
@@ -86,7 +92,7 @@ const localGuardianSchema = new Schema<LocalGuardian>({
 })
 
 // 2. Create a Schema corresponding to the document interface.
-const studentSchema = new Schema<Student>({
+const studentSchema = new Schema<TStudent, StudentModel, StudentMethods>({
   id: {
     type: String,
   },
@@ -143,5 +149,10 @@ const studentSchema = new Schema<Student>({
   },
 })
 
+studentSchema.methods.isUserExists = async function (id: string) {
+  const existingUser = await Student.findOne({ id })
+  return existingUser;
+}
+
 // Creating a model
-export const StudentModel = model<Student>('Student', studentSchema)
+export const Student = model<TStudent, StudentModel>('Student', studentSchema)

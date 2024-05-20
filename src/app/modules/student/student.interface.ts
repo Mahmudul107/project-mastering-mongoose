@@ -1,5 +1,5 @@
 import { Model } from 'mongoose'
-import { TStudent } from './student.interface'
+// import { TStudent } from './student.interface'
 // import { Schema, model, connect } from 'mongoose'
 
 // 1. Create an interface representing a document in MongoDB.
@@ -46,6 +46,7 @@ export type TStudent = {
   localGuardian: TLocalGuardian
   profileImage?: string
   isActive: 'active' | 'blocked'
+  isDeleted: boolean
 }
 
 // For creating static

@@ -155,9 +155,13 @@ const studentSchema = new Schema<TStudent, StudentModel, StudentMethods>({
     enum: ['active', 'blocked'],
     defaultValue: 'active',
   },
+  isDeleted: {
+    type: Boolean,
+    default: false,
+  }
 })
 
-// Pre save middleware/Hook: save data
+// Pre save middleware/Hook: work on create() and save()
 studentSchema.pre('save', async function (next) {
   // console.log(this, 'pre hook: We will save the data');
   // hashing password and save into bcrypt
@@ -172,11 +176,15 @@ studentSchema.pre('save', async function (next) {
   next()
 })
 
-// Post save middleware/hook
+// Post save middleware/hook: hide the password
 studentSchema.post('save', function (doc, next) {
   doc.password = ''
   next()
 })
+
+
+// Query middleware/hook
+
 
 //Creating a custom static method
 studentSchema.statics.isUserExists = async function (id: string) {

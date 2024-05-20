@@ -3,6 +3,7 @@ import { StudentServices } from './student.service'
 // import studentValidationSchema from './student.validation' /* Joi validation */
 import { z } from "zod"; /* Zod validation */
 import studentValidationSchema from './student.zod.validation';
+import { error } from 'console';
 
 const createStudent = async (req: Request, res: Response) => {
   try {
@@ -54,8 +55,12 @@ const getAllStudents = async (req: Request, res: Response) => {
       message: 'Students are retrieved successfully',
       data: result,
     })
-  } catch (err) {
-    console.log(err)
+  }catch (err: any) {
+    res.status(500).json({
+      success: false,
+      message: err.message || 'Something went wrong',
+      error: err,
+    })
   }
 }
 
@@ -70,8 +75,34 @@ const getSingleStudent = async (req: Request, res: Response) => {
       message: 'Student retrieved successfully',
       data: result,
     })
-  } catch (err) {
-    console.log(err)
+  }catch (err: any) {
+    res.status(500).json({
+      success: false,
+      message: err.message || 'Something went wrong',
+      error: err,
+    })
+  }
+}
+
+// Delete student from db
+const deleteStudent = async (req: Request, res: Response) => {
+  try{
+    const {studentId} = req.params;
+
+    const result = await StudentServices.deleteSingleStudentFromDB(studentId)
+
+    res.status(200).json({
+      success: true,
+      message: 'Student deleted successfully',
+      data: result
+    })
+  }
+  catch(err: any) {
+    res.status(500).json({
+      success: false,
+      message: err.message || ' Something went wrong',
+      error: err
+    })
   }
 }
 
@@ -79,4 +110,5 @@ export const StudentController = {
   createStudent,
   getAllStudents,
   getSingleStudent,
+  deleteStudent
 }

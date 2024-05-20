@@ -94,71 +94,83 @@ const localGuardianSchema = new Schema<TLocalGuardian>({
 })
 
 // 2. Create a Schema corresponding to the document interface.
-const studentSchema = new Schema<TStudent, StudentModel, StudentMethods>({
-  id: {
-    type: String,
-    required: [true, 'ID is required'],
-    unique: true,
-  },
-  password: {
-    type: String,
-    required: [true, 'Password is required'],
-  },
-  name: {
-    type: userNameSchema,
-    required: [true, 'Please enter a student name'],
-  },
-  gender: {
-    type: String,
-    enum: {
-      values: ['male', 'female', 'other'],
-      message: '{VALUE} is not a valid gender',
+const studentSchema = new Schema<TStudent, StudentModel, StudentMethods>(
+  {
+    id: {
+      type: String,
+      required: [true, 'ID is required'],
+      unique: true,
     },
-    required: [true, 'Please insert a gender'],
-  },
-  dob: { type: String, required: [true, 'Please enter your date of birth'] },
-  email: {
-    type: String,
-    required: [true, 'Please enter your email address'],
-    unique: true,
-    // validate: {
-    //   validator: (value: string) => validator.isEmail(value),
-    //   message: "{VALUE} is not valid ,Please enter with your valid email address"
-    // }
-  },
-  contactNo: {
-    type: String,
-    required: [true, 'Please enter your contact number'],
-  },
-  emergencyNo: {
-    type: String,
-    required: [true, 'Please enter your emergency contact number'],
-  },
-  bloodGroup: {
-    type: String,
-    enum: ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'],
-    required: true,
-  },
-  presentAddress: { type: String, required: true },
-  guardian: {
-    type: guardianSchema,
-    required: true,
-  },
+    password: {
+      type: String,
+      required: [true, 'Password is required'],
+    },
+    name: {
+      type: userNameSchema,
+      required: [true, 'Please enter a student name'],
+    },
+    gender: {
+      type: String,
+      enum: {
+        values: ['male', 'female', 'other'],
+        message: '{VALUE} is not a valid gender',
+      },
+      required: [true, 'Please insert a gender'],
+    },
+    dob: { type: String, required: [true, 'Please enter your date of birth'] },
+    email: {
+      type: String,
+      required: [true, 'Please enter your email address'],
+      unique: true,
+      // validate: {
+      //   validator: (value: string) => validator.isEmail(value),
+      //   message: "{VALUE} is not valid ,Please enter with your valid email address"
+      // }
+    },
+    contactNo: {
+      type: String,
+      required: [true, 'Please enter your contact number'],
+    },
+    emergencyNo: {
+      type: String,
+      required: [true, 'Please enter your emergency contact number'],
+    },
+    bloodGroup: {
+      type: String,
+      enum: ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'],
+      required: true,
+    },
+    presentAddress: { type: String, required: true },
+    guardian: {
+      type: guardianSchema,
+      required: true,
+    },
 
-  localGuardian: {
-    type: localGuardianSchema,
-    required: true,
+    localGuardian: {
+      type: localGuardianSchema,
+      required: true,
+    },
+    profileImage: { type: String, required: true },
+    isActive: {
+      type: String,
+      enum: ['active', 'blocked'],
+      defaultValue: 'active',
+    },
+    isDeleted: {
+      type: Boolean,
+      default: false,
+    },
   },
-  profileImage: { type: String, required: true },
-  isActive: {
-    type: String,
-    enum: ['active', 'blocked'],
-    defaultValue: 'active',
+  {
+    toJSON: {
+      virtuals: true,
+    },
   },
-  isDeleted: {
-    type: Boolean,
-    default: false,
-  }
+)
+
+// Mongoose virtual
+studentSchema.virtual('fullName').get(function () {
+  return `${this.name.firstName} ${this.name.middleName} ${this.name.lastName}`
 })
 
 // Pre save middleware/Hook: work on create() and save()
@@ -182,9 +194,23 @@ studentSchema.post('save', function (doc, next) {
   next()
 })
 
-
 // Query middleware/hook
+studentSchema.pre('find', function (next) {
+  this.find({ isDeleted: { $ne: true } })
+  next()
+})
 
+// Query middleware/hook for preventing to get deleted data
+studentSchema.pre('findOne', function (next) {
+  this.find({ isDeleted: { $ne: true } })
+  next()
+})
+
+// Query middleware/hook for preventing to get deleted data: aggregate
+studentSchema.pre('aggregate', function (next) {
+  this.pipeline().unshift({ $match: { isDeleted: { $ne: true } } })
+  next()
+})
 
 //Creating a custom static method
 studentSchema.statics.isUserExists = async function (id: string) {

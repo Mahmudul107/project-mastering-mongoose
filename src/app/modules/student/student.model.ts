@@ -7,7 +7,7 @@ import {
   StudentModel,
   TUserName,
 } from './student.interface'
-import bcrypt  from 'bcrypt'
+import bcrypt from 'bcrypt'
 import config from '../../config'
 
 // username sub-schema
@@ -103,7 +103,6 @@ const studentSchema = new Schema<TStudent, StudentModel, StudentMethods>({
   password: {
     type: String,
     required: [true, 'Password is required'],
-    unique: true,
   },
   name: {
     type: userNameSchema,
@@ -171,11 +170,12 @@ studentSchema.pre('save', async function (next) {
     Number(config.bcrypt_salt_round),
   )
   next()
-  
 })
 
-studentSchema.post('save', function () {
-  console.log(this, 'post hook: We saved our data')
+// Post save middleware/hook
+studentSchema.post('save', function (doc, next) {
+  doc.password = ''
+  next()
 })
 
 //Creating a custom static method
